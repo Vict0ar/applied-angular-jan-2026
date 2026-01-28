@@ -80,18 +80,17 @@ import { Key } from 'node:readline';
   </div>`,
   styles: [],
   host: {
-    class: '',
+    tabindex: '1',
+    '(keyup.control.shift.h)': 'onHelpRequested()',
   },
 })
 export class App {
-  onKeyPressDown(evt: Event) {
-    console.log('You Hit A Key');
-    const key = evt as KeyboardEvent;
-    if (key !== null) {
-      console.log(`Key pressed: ${key.key}`);
-    }
-  }
   protected router = inject(Router);
+  onHelpRequested() {
+    console.log('Getting you help...');
+    this.router.navigate(['/home/help']);
+  }
+
   goHome() {
     this.router.navigateByUrl('/home');
   }
