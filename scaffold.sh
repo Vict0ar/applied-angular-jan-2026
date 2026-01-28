@@ -54,7 +54,7 @@ fi
 # Set up paths
 template_dir=".templates/landing-feature"
 output_dir="src/app/areas/$area"
-feature_dir="$output_dir/feature-${feature_name}/${feature_name}-landing"
+feature_dir="$output_dir/feature-${feature_name}"
 
 # Check if feature directory already exists
 if [ -d "$feature_dir" ]; then
