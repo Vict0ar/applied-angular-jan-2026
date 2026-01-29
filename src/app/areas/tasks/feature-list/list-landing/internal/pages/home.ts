@@ -5,12 +5,13 @@ import { PageLayout } from '@ht/shared/ui-common/layouts/page';
 import { TaskEntity, tasksStore } from '@ht/shared/data/stores/tasks/store';
 import { form, minLength, required, FormField } from '@angular/forms/signals';
 import { max } from 'rxjs';
+import { FormInputComponent } from '@ht/shared/ui-common/forms/inputs/form-input';
 
 // Creating a provider WHEREEVER means you are saying "create a new instance of this thing when injected here"
 @Component({
   selector: 'ht-home-home',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [PageLayout, DatePipe, DecimalPipe, FormField],
+  imports: [PageLayout, DatePipe, DecimalPipe, FormField, FormInputComponent],
 
   template: `
     <app-ui-page title="Your Tasks">
@@ -18,11 +19,11 @@ import { max } from 'rxjs';
         <form (submit)="handleForm($event)">
           <div class="form-control w-full max-w-xs">
             <label class="label"> Description: </label>
-            <input
+
+            <app-ui-form-input
+              id="description"
+              label="Description"
               [formField]="form.description"
-              type="text"
-              placeholder="Task Description"
-              class="input input-bordered w-full max-w-xs"
             />
 
             <button class="btn btn-primary mt-4" type="submit">Save Task</button>
@@ -58,7 +59,7 @@ import { max } from 'rxjs';
                   }
                   @if (task.isLocal && task.isValid) {
                     <button (click)="store.syncToServer(task)" class="badge badge-success ml-2">
-                      Ready to Sync
+                      Add To Log
                     </button>
                   }
                   @if (!task.isValid) {
@@ -117,8 +118,10 @@ export class HomePage {
   });
   handleForm($event: SubmitEvent) {
     $event.preventDefault();
-    this.store.changeDescription(this.currentEdit()!, this.model().description);
-    this.isEditing.set(false);
-    this.currentEdit.set(null);
+    if (this.form().valid()) {
+      this.store.changeDescription(this.currentEdit()!, this.model().description);
+      this.isEditing.set(false);
+      this.currentEdit.set(null);
+    }
   }
 }
