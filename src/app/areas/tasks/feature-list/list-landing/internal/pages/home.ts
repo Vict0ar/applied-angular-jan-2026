@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { PageLayout } from '@ht/shared/ui-common/layouts/page';
+import { form, FormField, maxLength, minLength, required } from '@angular/forms/signals';
 import { TaskEntity, tasksStore } from '@ht/shared/data/stores/tasks/store';
-import { form, minLength, required, FormField } from '@angular/forms/signals';
-import { max } from 'rxjs';
 import { FormInputComponent } from '@ht/shared/ui-common/forms/inputs/form-input';
+import { PageLayout } from '@ht/shared/ui-common/layouts/page';
 
 // Creating a provider WHEREEVER means you are saying "create a new instance of this thing when injected here"
 @Component({
@@ -43,7 +42,7 @@ import { FormInputComponent } from '@ht/shared/ui-common/forms/inputs/form-input
           </thead>
           <tbody>
             @for (task of store.taskList(); track task.startTime) {
-              <tr [title]="task.id" class=" animate-fade-out">
+              <tr [title]="task.id" class=" animate-fade-out" [class.bg-base-100]="task.isLocal">
                 <th>{{ task.description }}</th>
                 <td>{{ task.startTime | date: 'shortTime' }}</td>
                 <td>{{ task.endTime | date: 'shortTime' }}</td>
@@ -108,13 +107,15 @@ export class HomePage {
   store = inject(tasksStore);
   isEditing = signal(false);
 
+  // for a signal form, yo create a signal with the "initial state" of the thing that will hold your form values.
   model = signal<Pick<TaskEntity, 'description' | 'id'>>({
     id: '',
     description: '',
   });
   form = form(this.model, (sp) => {
     required(sp.description);
-    minLength(sp.description, 3);
+    minLength(sp.description, 5);
+    maxLength(sp.description, 20);
   });
   handleForm($event: SubmitEvent) {
     $event.preventDefault();

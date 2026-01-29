@@ -1,5 +1,4 @@
 import { http, delay, HttpResponse } from 'msw';
-import { start } from 'node:repl';
 
 const serverTasks: unknown[] = [
   {
@@ -19,7 +18,7 @@ const serverTasks: unknown[] = [
 ];
 export default [
   http.get('/api/tasks', async () => {
-    await delay();
+    await delay(2000);
     return HttpResponse.json(serverTasks);
   }),
   http.post('/api/tasks', async ({ request }) => {

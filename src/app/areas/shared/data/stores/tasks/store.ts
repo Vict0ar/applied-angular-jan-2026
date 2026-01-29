@@ -19,7 +19,6 @@ import {
 } from '@ngrx/signals/entities';
 import { Task } from './internal/types';
 import { httpResource } from '@angular/common/http';
-import { min } from 'rxjs';
 
 export type TaskEntity = Task & { minutes: number; id: string; description: string };
 
@@ -67,6 +66,7 @@ export const tasksStore = signalStore(
   // instead of having a reducer that takes actions and switches on them, just create methods.
   withMethods((store) => {
     return {
+      // async is fine in Angular. You can async and await like the snobby react bros now.
       syncToServer: async (task: TaskEntity) => {
         patchState(store, {
           _mutatingTasks: [...store._mutatingTasks(), task.id],
@@ -88,7 +88,9 @@ export const tasksStore = signalStore(
           { _mutatingTasks: store._mutatingTasks().filter((id) => id !== task.id) },
           removeEntity(task.id),
         );
-        store._serverTasks.reload();
+        store._serverTasks.reload(); // this can be whatever
+        // what I'm doing is saying "reload the whole list"
+        // if the post returned a new entity, you *could* just add it, but this is safest.
       },
       updateDescription: (task: TaskEntity, newDescription: string) => {
         patchState(
@@ -154,6 +156,7 @@ export const tasksStore = signalStore(
       }),
       taskList: computed(() => {
         // Promise you will see why later...
+
         const localTasks = store.entities().map((task) => ({
           ...task,
           isLocal: true,
