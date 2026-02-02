@@ -22,7 +22,13 @@ import { httpResource } from '@angular/common/http';
 
 export type TaskEntity = Task & { minutes: number; id: string; description: string };
 
+export type BooksPreference = {
+  sortBy: string;
+  sortAscending: boolean;
+};
+
 type TasksState = {
+  booksPreference: BooksPreference;
   isRecording: boolean;
   currentTime: {
     hours: number;
@@ -52,6 +58,7 @@ export const tasksStore = signalStore(
     };
   }),
   withState<TasksState>({
+    booksPreference: { sortBy: '', sortAscending: false },
     isRecording: false,
     currentTime: {
       hours: 0,
@@ -67,6 +74,10 @@ export const tasksStore = signalStore(
   withMethods((store) => {
     return {
       // async is fine in Angular. You can async and await like the snobby react bros now.
+
+      updateBookPreferences: (booksPreference: BooksPreference) => {
+        patchState(store, { booksPreference: booksPreference });
+      },
       syncToServer: async (task: TaskEntity) => {
         patchState(store, {
           _mutatingTasks: [...store._mutatingTasks(), task.id],
@@ -187,8 +198,14 @@ export const tasksStore = signalStore(
         const savedTasks = JSON.parse(savedJson) as TaskEntity[];
         patchState(store, setEntities(savedTasks));
       }
+      const savedBookPreferencesJson = localStorage.getItem('BookPreferences');
+      if (savedBookPreferencesJson) {
+        const savedBookPreferences = JSON.parse(savedBookPreferencesJson) as BooksPreference;
+        patchState(store, { booksPreference: savedBookPreferences });
+      }
       watchState(store, () => {
         localStorage.setItem('tasks', JSON.stringify(store.entities()));
+        localStorage.setItem('BookPreferences', JSON.stringify(store.booksPreference()));
       });
 
       setInterval(() => {
